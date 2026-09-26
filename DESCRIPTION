@@ -1,0 +1,30 @@
+Package: diy.sem.plot
+Type: Package
+Title: Manually Plot Path Diagrams for Structural Equation Models
+Version: 1.0.0
+Authors@R: c(
+    person(
+      "Sebastian", "Nagy",
+      email = "snagy8610@gmail.com",
+      role = c("aut", "cre", "cph")
+    )
+  )
+Description: Manually plot fully customisable path diagrams for structural equation
+             models (SEM). Map out node positions using simple coordinates and specify where on the
+             perimeter of each node paths begin and end. Extensive fine-tuning options allow the creation of
+             a path diagram exactly as envisioned, entirely within R.
+Encoding: UTF-8
+Imports: ggplot2, ggtext, ggforce, lavaan, patchwork
+Suggests: knitr, rmarkdown, testthat
+Config/testthat/edition: 3
+URL: https://github.com/snagy86/diy.sem.plot
+BugReports: https://github.com/snagy86/diy.sem.plot/issues
+VignetteBuilder: knitr
+License: MIT + file LICENSE
+Config/roxygen2/version: 8.1.0
+NeedsCompilation: no
+Packaged: 2026-09-15 10:31:57 UTC; snagy
+Author: Sebastian Nagy [aut, cre, cph]
+Maintainer: Sebastian Nagy <snagy8610@gmail.com>
+Repository: CRAN
+Date/Publication: 2026-09-26 16:20:13 UTC
