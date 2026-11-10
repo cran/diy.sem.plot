@@ -43,12 +43,11 @@ designed for use within the \code{path_positions} argument of \code{\link[=diyPa
 \code{from}/\code{to} in \code{path()} must exactly match the variable name used in the \code{lavaan} model syntax.
 Furthermore, the order must also be correct for regression or loading paths. A misspelled or mismatched
 \code{path()} entry will not raise an error, instead, it will use default attachment points and values, not applying
-specific customisations.
+specific customisations. This can be completely avoided using \code{\link[=template]{template()}}.
 
-\code{cov_curve}'s value can be used to adjust direction of curve on covariance/correlation path.
-For a mostly vertical path (i.e. node1: x = 0, y = 1 -> node2: x = 0, y = 2), positive curvature bends it left and negative curvature
-bends it right. For a mostly horizontal path (i.e. node1: x = 1, y = 0 -> node2: x = 2, y = 0), positive curvature bends
-it down and negative curvature bends it up. Best results typically range from -1 to 1.
+\code{cov_curve} controls the curvature of covariance/correlation paths: its size sets how strongly the
+path bends, and its sign sets which way. If a path bends the wrong way, flip the sign. Best results
+typically range from -1 to 1.
 }
 \examples{
 
@@ -62,4 +61,8 @@ path(from = "anx", to = "dep", side_from = "right", side_to = "left")
 
 path(from = "dep", to = "anx", side_from = "left", side_to = "left", cov_curve = -0.6)
 
+}
+\seealso{
+\code{\link[=node]{node()}} to specify node positions;
+\code{\link[=diyPaths]{diyPaths()}} to render the diagram; \code{\link[=template]{template()}} to generate a starting \code{path_positions} list.
 }

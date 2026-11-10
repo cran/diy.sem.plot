@@ -15,7 +15,7 @@ panel_title(panel_num = 1, title = NULL)
 A list containing arguments that specify a panel's number and title, for use within the \code{panel_titles} argument of \code{\link[=diyPaths]{diyPaths()}}.
 }
 \description{
-Helper function that creates a list of arguments which specify custom titles and its target panel,
+Helper function that creates a list of arguments which specify a custom title and its target panel,
 designed for use within the \code{panel_titles} argument of \code{\link[=diyPaths]{diyPaths()}}. Use the
 \code{show_group_labels} argument in \code{\link[=diyPaths]{diyPaths()}} to view each panel's number and
 which group it refers to.
@@ -26,5 +26,8 @@ panel_title(title = "My SEM Model")
 
 # titling the second panel of a multi-group model
 panel_title(panel_num = 2, title = "Female Participants")
-
+}
+\seealso{
+\code{\link[=diyPaths]{diyPaths()}}, where the list of titles is passed to \code{panel_titles};
+\code{\link[=panel_note]{panel_note()}} for adding notes to panels; \code{\link[=template]{template()}}, whose output includes a starting title list.
 }

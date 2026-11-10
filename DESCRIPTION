@@ -1,7 +1,7 @@
 Package: diy.sem.plot
 Type: Package
 Title: Manually Plot Path Diagrams for Structural Equation Models
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: c(
     person(
       "Sebastian", "Nagy",
@@ -23,8 +23,8 @@ VignetteBuilder: knitr
 License: MIT + file LICENSE
 Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-09-15 10:31:57 UTC; snagy
+Packaged: 2026-11-10 14:25:38 UTC; snagy
 Author: Sebastian Nagy [aut, cre, cph]
 Maintainer: Sebastian Nagy <snagy8610@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-09-26 16:20:13 UTC
+Date/Publication: 2026-11-10 23:40:07 UTC

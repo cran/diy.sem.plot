@@ -36,7 +36,12 @@ diyPaths(
   panel_cols = NULL,
   margin_x = 0.5,
   margin_y = 0.5,
-  look_up_table = FALSE
+  look_up_table = FALSE,
+  panel_notes = NULL,
+  note_text_size = NULL,
+  title_text_size = NULL,
+  font_family = "",
+  title_note_font_family = NULL
 )
 }
 \arguments{
@@ -48,7 +53,7 @@ diyPaths(
 
 \item{standardised}{Logical. If \code{TRUE}, uses standardised parameter estimates (\code{est.std}). Default is \code{FALSE}.}
 
-\item{digits}{Number of digits to display for estimates. Default is \code{3}.}
+\item{digits}{Number of decimal places to display for estimates. Default is \code{3}.}
 
 \item{est_stars}{Logical. Whether to display significance stars on path estimates. Default is \code{FALSE}.}
 
@@ -72,7 +77,7 @@ diyPaths(
 
 \item{grid_axis_scale}{Sets the spacing of grid-lines when \code{show_grid = TRUE}. Default is \code{1}.}
 
-\item{non_transparent_text}{Logical. If \code{TRUE}, path estimate labels receive a white background mask. Default is \code{TRUE}.}
+\item{non_transparent_text}{Logical. If \code{TRUE}, path estimates receive a white background mask, if \code{FALSE}, they have a transparent background. Default is \code{TRUE}.}
 
 \item{latent_node_text_size}{Text font size for latent node labels. Default is \code{4}.}
 
@@ -94,20 +99,32 @@ diyPaths(
 
 \item{show_group_labels}{Logical. For multi-group models, whether to annotate each panel
 with its panel number and the raw group value it represents (e.g. "Panel 1: Group = male").
-Needed to identify which diagram represents each group and its internal panel number when creating panel titles.
+Needed to identify which diagram represents each group and its internal panel number when creating panel titles and notes.
 Default is \code{FALSE}.}
 
 \item{panel_titles}{Specify a list of titles for panels. Use the \code{\link[=panel_title]{panel_title()}} helper function to assist with this. Any panel not referenced is
 left untitled. Default is \code{NULL}.}
 
-\item{panel_cols}{Integer for number columns to use when arranging multi-group panels. Default is \code{NULL}.}
+\item{panel_cols}{Integer for number of columns to use when arranging multi-group panels. Default is \code{NULL}.}
 
 \item{margin_x}{Padding for plot limits along the x-axis. Default is \code{0.5}.}
 
-\item{margin_y}{Padding for plot limits along y-axis. Default is \code{0.5}.}
+\item{margin_y}{Padding for plot limits along the y-axis. Default is \code{0.5}.}
 
 \item{look_up_table}{Logical. If \code{TRUE}, also returns a look-up table detailing the width (x scale) and height (y scale) of latent and observed nodes,
 along with the text sizes used for latent, observed, and path labels. Default is \code{FALSE}.}
+
+\item{panel_notes}{Specify a list of notes, displayed as captions beneath each panel. Use the \code{\link[=panel_note]{panel_note()}} helper function to assist with this. Any panel not referenced is
+left without a note. Default is \code{NULL}.}
+
+\item{note_text_size}{Font size for panel notes (captions). Default is NULL (ggplot2's default caption size).}
+
+\item{title_text_size}{Font size for panel titles. Default is NULL (ggplot2's default title size).}
+
+\item{font_family}{Font family used for all text in the diagram. Default is \code{""}, the graphics device's default font.}
+
+\item{title_note_font_family}{Font family for panel titles and notes. Default is \code{NULL}, which
+uses \code{font_family}.}
 }
 \value{
 A \code{ggplot} (or \code{patchwork}, for multi-group models) object representing the SEM
@@ -119,26 +136,13 @@ path diagram(s). If \code{look_up_table = TRUE}, a list containing the diagram(s
 Plot fully customisable path diagrams for structural equation models fitted with \pkg{lavaan}, rendered using \pkg{ggplot2}.
 
 To render the \code{ggplot} object of the diagram, the function only requires users to supply a fitted \code{lavaan} model, specify node positions using x-y coordinates, and detail where on
-the perimeter of each node (top, bottom, left, or right) each path should begin and end. The render automatically inserts estimates centered on the midpoint and adjusts each node's
+the perimeter of each node (top, bottom, left, or right) each path should begin and end. The render automatically inserts estimates centred on the midpoint and adjusts each node's
 shape to match its variable type. A range of optional fine-tuning arguments are included, facilitating the creation of a path diagram exactly as you envision it, entirely within R.
 }
 \details{
-Using the function requires 4 steps and is illustrated by the example below.
-See \code{vignette("diy.sem.plot")} for in-depth examples and guidance on using the function's arguments.
-\enumerate{
-\item Specify and fit the SEM using \pkg{lavaan}.
-\item Specify \code{node_positions} as a list (\code{node_positions = list(...)}) and,
-within it, define each node's position and label using the \code{\link[=node]{node()}}
-helper function.
-\item Specify \code{path_positions} as a list (\code{path_positions = list(...)}) and,
-within it, define each path's connection points, curvature, and label
-adjustments using the \code{\link[=path]{path()}} helper function.
-\item Call \code{diyPaths()}, passing in the fitted model, \code{node_positions},
-and \code{path_positions}, along with any additional display augmentations (i.e. show significance stars on estimates).
-}
-
-Creating a diagram for a specific model is inherently an iterative process. As such, steps 2-4 will likely need to be repeated
-with additional fine-tuning adjustments to achieve the desired result.
+The easiest way to start is with \code{\link[=template]{template()}}, which prints ready-to-run code for your fitted model.
+Edit the node positions and path sides it generates, render with \code{diyPaths()}, then fine-tune and
+re-render until the layout looks right. See \code{vignette("diy.sem.plot")} for worked examples.
 }
 \examples{
 
@@ -148,7 +152,6 @@ library(lavaan)
 library(ggplot2)
 
 data(HolzingerSwineford1939, package = "lavaan")
-
 
 #specify the model
 
@@ -165,73 +168,91 @@ sem_model <- '
 
 fit <- sem(sem_model, data = HolzingerSwineford1939)
 
-#specify the node position, this was done iteratively with show_grid to help with layout.
+#generate a starting template
+
+temp <- template(fit = fit, diyPaths_arguments = "max", quiet = TRUE)
+
+#### edited template ####
 
 node_list <- list(
-  #main latent variable structure
-  node("visual", x = 1, y = 1, label = "Visual"),
-  node("textual", x = 1, y = 2, label = "Textual"),
-  node("speed", x = 4, y = 1.5, label = "Speed"),
-
-  # observed variables that visual perception ability loads onto
-  node("x1", x = -0.06, y = -0.5, label = "Visual\nPerception"), #\n creates a line break
-  node("x2", x = 1, y = -0.5, label = "Cubes"),
-  node("x3", x = 2.06, y = -0.5, label = "Lozenges"),
-
-  #observed variables that textual ability loads onto
-  node("x4", x = -0.06, y = 3.5, label = "Paragraph\nComprehension"),
-  node("x5", x = 1, y = 3.5, label = "Sentence\nCompletion"),
-  node("x6", x = 2.06, y = 3.5, label = "Word\nMeaning"),
-
-  #observed variables that speeded cognitive processing loads onto
-  node("x7", x = 6, y = 0.5, label = "Speeded\nAddition"),
-  node("x8", x = 6, y = 1.5, label = "Speeded\nCounting"),
-  node("x9", x = 6, y = 2.5, label = "Speeded\nDiscrimination")
+  node(name = "visual", x = 1, y = 1, label = "Visual"),
+  node(name = "textual", x = 1, y = 2, label = "Textual"),
+  node(name = "speed", x = 4, y = 1.5, label = "Speed"),
+  node(name = "x1", x = -0.06, y = -0.5, label = "Visual\nPerception"),
+  node(name = "x2", x = 1, y = -0.5, label = "Cubes"),
+  node(name = "x3", x = 2.06, y = -0.5, label = "Lozenges"),
+  node(name = "x4", x = -0.06, y = 3.5, label = "Paragraph\nComprehension"),
+  node(name = "x5", x = 1, y = 3.5, label = "Sentence\nCompletion"),
+  node(name = "x6", x = 2.06, y = 3.5, label = "Word\nMeaning"),
+  node(name = "x7", x = 6, y = 0.5, label = "Speeded\nAddition"),
+  node(name = "x8", x = 6, y = 1.5, label = "Speeded\nCounting"),
+  node(name = "x9", x = 6, y = 2.5, label = "Speeded\nDiscrimination")
 )
 
-#Specify the paths
-
 path_list <- list(
+  # regression paths
+  path(from = "visual", to = "speed", side_from = "right", side_to = "left"),
+  path(from = "textual", to = "speed", side_from = "right", side_to = "left"),
+
+  # loading paths
   path(from = "visual", to = "x1", side_from = "bottom", side_to = "top", nudge_text_x = -0.1),
   path(from = "visual", to = "x2", side_from = "bottom", side_to = "top"),
   path(from = "visual", to = "x3", side_from = "bottom", side_to = "top", nudge_text_x = 0.1),
-
   path(from = "textual", to = "x4", side_from = "top", side_to = "bottom", nudge_text_x = -0.1),
   path(from = "textual", to = "x5", side_from = "top", side_to = "bottom"),
   path(from = "textual", to = "x6", side_from = "top", side_to = "bottom", nudge_text_x = 0.1),
+  path(from = "speed", to = "x7", side_from = "right", side_to = "left"),
+  path(from = "speed", to = "x8", side_from = "right", side_to = "left"),
+  path(from = "speed", to = "x9", side_from = "right", side_to = "left"),
 
-  path(from = "speed",   to = "x7", side_from = "right", side_to = "left"),
-  path(from = "speed",   to = "x8", side_from = "right", side_to = "left"),
-  path(from = "speed",   to = "x9", side_from = "right", side_to = "left"),
-
-  path(from = "visual",  to = "speed", side_from = "right", side_to = "left"),
-  path(from = "textual", to = "speed", side_from = "right", side_to = "left"),
-
-  path(from = "visual",  to = "textual", side_from = "left", side_to = "left", cov_curve = -0.6)
+  # covariance/correlation paths
+  path(from = "visual", to = "textual", side_from = "left", side_to = "left", cov_curve = -0.6)
 )
-
-#Creating title
 
 title_list <- list(
-  panel_title(panel_num = 1,
-              title = "My SEM Plot"))
-
-#creating the diagram
-
-p <- diyPaths(
-  fit = fit,
-  node_positions = node_list,
-  path_positions = path_list,
-  panel_titles = title_list,
-  standardised = TRUE,
-  est_stars = TRUE,
-  observed_node_size_adjust = 0.55,
-  observed_node_text_size = 3,
-  latent_node_size_adjust = 0.8,
-  show_grid = TRUE,
-  grid_axis_scale = 0.5,
-  look_up_table = TRUE
+  panel_title(panel_num = 1, title = "My SEM Plot")
 )
 
+note_list <- list(
+  panel_note(panel_num = 1, note_text = "Standardised estimates shown.")
+)
+
+p <- diyPaths(fit = fit, node_positions = node_list, path_positions = path_list,
+              standardised = TRUE,
+              digits = 3,
+              est_stars = TRUE,
+              est_p = FALSE,
+              est_ci = FALSE,
+              show_variances = FALSE,
+              variance_stars = FALSE,
+              variance_p = FALSE,
+              variance_ci = FALSE,
+              sig_linetype = FALSE,
+              p_threshold = 0.05,
+              panel_titles = title_list,
+              panel_notes = note_list,
+              show_grid = TRUE,
+              grid_axis_scale = 0.5,
+              non_transparent_text = TRUE,
+              latent_node_text_size = 4,
+              observed_node_text_size = 3,
+              path_text_size = 3.5,
+              line_thickness = 0.6,
+              arrow_size = 0.2,
+              node_width = 1.5, node_height = 1,
+              latent_node_size_adjust = 0.8,
+              observed_node_size_adjust = 0.55,
+              show_group_labels = FALSE,
+              panel_cols = NULL,
+              font_family = "sans",
+              title_note_font_family = "serif",
+              margin_x = 0.5,
+              margin_y = 0.5,
+              look_up_table = TRUE)
+
 print(p)
+}
+\seealso{
+\code{\link[=template]{template()}} to generate starting code for \code{node_positions}, \code{path_positions}, \code{panel_titles} and \code{panel_notes};
+\code{\link[=node]{node()}}, \code{\link[=path]{path()}}, \code{\link[=panel_title]{panel_title()}}, and \code{\link[=panel_note]{panel_note()}} for the helper functions used within them.
 }
